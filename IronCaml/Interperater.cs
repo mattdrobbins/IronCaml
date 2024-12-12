@@ -35,7 +35,21 @@ namespace IronCaml
 
         public object VisitBinaryExpression(Expression.Binary expr)
         {
-            throw new NotImplementedException();
+            object left = Evaluate(expr.Left);
+            object right = Evaluate(expr.Right);
+
+            switch (expr.Operator.Type)
+            {
+                case TokenType.PLUS:
+                    if (left is long && right is long)
+                    {
+                        return (long)left + (long)right;
+                    }
+                    throw new RuntimeException(expr.Operator,
+                        "Invalid addition");
+                default:
+                    return null;
+            }
         }
 
         public object VisitExpressionStatement(Statement.ExpressionStatement stmt)
@@ -71,6 +85,11 @@ namespace IronCaml
         public object VisitLiteralExpr(Expression.Literal expr)
         {
             return expr.Value;
+        }
+
+        public object VisitVariableExpr(Expression.Variable expr)
+        {
+            return _locals[expr.Name.Lexeme];
         }
 
         private object Evaluate(Expression expr)

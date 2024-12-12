@@ -9,6 +9,28 @@ namespace IronCaml.Tests
     public class ParserTest
     {
         [Fact]
+        public void SingleExpression()
+        {
+            var tokens = new List<Token>
+            {
+                new Token(TokenType.IDENTIFIER, "foo", null, 1),
+                new Token(TokenType.EOF, "", null, 1)
+            };
+
+            var expected = new List<Statement>
+            {
+                new Statement.ExpressionStatement(
+                    new Expression.Variable(
+                        new Token(TokenType.IDENTIFIER, "foo", null, 1)))
+            };
+
+            var parser = new Parser(tokens);
+            var result = parser.Parse();
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
         public void BinaryExpression()
         {
             var tokens = new List<Token>

@@ -85,6 +85,11 @@ namespace IronCaml
                 return new Expression.Literal(Previous().Literal);
             }
 
+            if (Match(TokenType.IDENTIFIER))
+            {
+                return new Expression.Variable(Previous());
+            }
+
             throw Error(Peek(), "Expect expression.");
         }
 

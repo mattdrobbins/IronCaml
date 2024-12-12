@@ -14,6 +14,26 @@ namespace IronCaml
 
             R VisitBinaryExpression(Binary expr);
 
+            R VisitVariableExpr(Variable expr);
+        }
+
+        public record Variable : Expression
+        {
+            private readonly Token _name;
+
+            public Token Name => _name;
+
+            public Variable(Token name)
+            {
+                _name = name;
+            }
+
+            public override R Accept<R>(Visitor<R> visitor)
+            {
+                return visitor.VisitVariableExpr(this);
+            }
+
+            public readonly Token name;
         }
 
         public record Literal : Expression

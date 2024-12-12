@@ -18,6 +18,11 @@ namespace IronCaml
             throw new NotImplementedException();
         }
 
+        public string VisitVariableExpr(Expression.Variable expr)
+        {
+            throw new NotImplementedException();
+        }
+
         private string Parenthesise(string name, params Expression[] exprs)
         {
             var builder = new StringBuilder();
