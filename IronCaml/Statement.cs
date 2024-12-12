@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +16,39 @@ namespace IronCaml
         {
             R VisitLetDeclerationStatment(LetDecleration stmt);
 
+            R VisitFunctionStatement(Function stmt);
+
             R VisitExpressionStatement(ExpressionStatement stmt);
+        }
+
+        public record Function : Statement
+        {
+            private readonly Token _name;
+            private readonly List<Token> _params;
+            private readonly Expression _body;
+
+            public Token Name => _name;
+            public Expression Body => _body;
+            public HashSet<Token> Params => new HashSet<Token>(_params);
+
+            public Function(Token name, List<Token> _params, Expression body)
+            {
+                _name = name;
+                this._params = _params;
+                _body = body;
+            }
+
+            public override T Accept<T>(Visitor<T> visitor)
+            {
+                return visitor.VisitFunctionStatement(this);
+            }
+
+            public virtual bool Equals(Function? obj)
+            {
+                return Name == obj.Name && Body == obj.Body && Params.SetEquals(obj.Params);
+            }
+
+            public override int GetHashCode() => HashCode.Combine(Body, Name, Params);
         }
 
         public record ExpressionStatement : Statement

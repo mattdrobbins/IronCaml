@@ -35,29 +35,41 @@ namespace IronCaml
 
         private Statement Decleration()
         {
-            if (Match(TokenType.LET)) return LetDecleration();
-            return ExpressionStatement(); ;
+            if (Match(TokenType.LET)) return Let();
+            return ExpressionStatement();
         }
+
+        private Statement Let()
+        {
+            Token name = Consume(TokenType.IDENTIFIER, "Expect identifier");
+
+            Expression expression = null;
+
+            var arguments = new List<Token>();
+
+            while(Match(TokenType.IDENTIFIER))
+            {
+                var argument = Previous();
+                arguments.Add(argument);
+            }
+
+            Consume(TokenType.EQUAL, "Expect equals after let");
+
+            expression = Expression();
+
+            if (arguments.Any())
+            {
+                return new Statement.Function(name, arguments, expression);
+            }
+
+            return new Statement.LetDecleration(name, expression);
+        }
+
 
         private Statement ExpressionStatement()
         {
             var value = Expression();
             return new ExpressionStatement(value);
-        }
-
-        private Statement LetDecleration()
-        {
-            Token name = Consume(TokenType.IDENTIFIER, "Expect variable name");
-
-            Expression expression = null;
-
-            if (Match(TokenType.EQUAL))
-            {
-                expression = Expression();
-            }
-
-            return new Statement.LetDecleration(name, expression);
-
         }
 
         private Expression Expression()

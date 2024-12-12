@@ -63,6 +63,11 @@ namespace IronCaml
             return null;
         }
 
+        public object VisitFunctionStatement(Statement.Function stmt)
+        {
+            throw new NotImplementedException();
+        }
+
         public object VisitLetDeclerationStatment(Statement.LetDecleration stmt)
         {
             object value = null;

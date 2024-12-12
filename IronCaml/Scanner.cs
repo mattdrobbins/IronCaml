@@ -110,7 +110,7 @@ namespace IronCaml
         {
             return (c >= 'a' && c <= 'z')
                 || (c >= 'A' && c <= 'Z')
-                || c == '-';
+                || c == '-' || c == '_';
         }
 
         private bool IsAlphaNumeric(char c)
