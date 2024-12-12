@@ -29,7 +29,7 @@ namespace IronCaml
 
             public Token Name => _name;
             public Expression Body => _body;
-            public HashSet<Token> Params => new HashSet<Token>(_params);
+            public List<Token> Params => new List<Token>(_params);
 
             public Function(Token name, List<Token> _params, Expression body)
             {
@@ -45,7 +45,7 @@ namespace IronCaml
 
             public virtual bool Equals(Function? obj)
             {
-                return Name == obj.Name && Body == obj.Body && Params.SetEquals(obj.Params);
+                return Name == obj.Name && Body == obj.Body && Params.SequenceEqual(obj.Params);
             }
 
             public override int GetHashCode() => HashCode.Combine(Body, Name, Params);

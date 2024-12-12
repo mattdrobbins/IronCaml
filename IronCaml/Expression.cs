@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace IronCaml
 {
@@ -15,6 +16,35 @@ namespace IronCaml
             R VisitBinaryExpression(Binary expr);
 
             R VisitVariableExpr(Variable expr);
+
+            R VisitCallExpression(Call expr);
+        }
+
+        public record Call : Expression
+        {
+            private readonly Expression _callee;
+            private readonly List<Expression> _arguments;
+
+            public Expression Callee => _callee;
+            public List<Expression> Arguments => _arguments;
+
+            public Call(Expression callee, List<Expression> arguments)
+            {
+                _callee = callee;
+                _arguments = arguments;
+            }
+
+            public override R Accept<R>(Visitor<R> visitor)
+            {
+                return visitor.VisitCallExpression(this);
+            }
+
+            public virtual bool Equals(Call? obj)
+            {
+                return _callee == obj.Callee && Arguments.SequenceEqual(obj.Arguments);
+            }
+
+            public override int GetHashCode() => HashCode.Combine(Callee, Arguments);
         }
 
         public record Variable : Expression

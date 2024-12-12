@@ -74,13 +74,34 @@ namespace IronCaml
 
         private Expression Expression()
         {
-            var expression = Primary();
+            var expression = Call();
 
             if (Match(TokenType.PLUS))
             {
                 Token _operator = Previous();
                 var right = Primary();
                 expression = new Expression.Binary(expression, _operator, right);
+            }
+
+            return expression;
+        }
+
+        private Expression Call()
+        {
+            var expression = Primary();
+
+            var didMatch = false;
+            var arguments = new List<Expression>();
+
+            while (Check(TokenType.IDENTIFIER) || Check(TokenType.INTEGER) || Check(TokenType.STRING))
+            {
+                didMatch = true;
+                arguments.Add(Primary());
+            }
+
+            if (didMatch)
+            {
+                expression = new Expression.Call(expression, arguments);
             }
 
             return expression;

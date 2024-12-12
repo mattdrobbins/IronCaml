@@ -8,7 +8,7 @@ namespace IronCaml
 {
     public class Interperater : Statement.Visitor<object>, Expression.Visitor<object>
     {
-        private Dictionary<string, object> _locals = new();
+        private Dictionary<string, object> env = new Dictionary<string, object>();
 
         public Interperater(bool interactive = false)
         {
@@ -65,7 +65,46 @@ namespace IronCaml
 
         public object VisitFunctionStatement(Statement.Function stmt)
         {
-            throw new NotImplementedException();
+            var function = new OCamlFunction(stmt, env);
+            env[stmt.Name.Lexeme] = function;
+            return null;
+        }
+
+        public object VisitCallExpression(Expression.Call expr)
+        {
+            var callee = Evaluate(expr.Callee);
+            List<object> args = new List<object>();
+
+            foreach (var arg in expr.Arguments)
+            {
+                args.Add(Evaluate(arg));
+            }
+
+            if (!(callee is ICallable))
+            {
+                throw new RuntimeException(null, "Call only call functions and classes");
+            }
+
+            ICallable function = (ICallable)callee;
+
+            if (args.Count != function.Arity())
+            {
+                throw new RuntimeException(null, $"Expected {function.Arity()} arguments but got " +
+                    $"{args.Count}");
+            }
+
+            return function.Call(this, args);
+        }
+
+        public object CallFunction(Expression exp, Dictionary<string, object> arguments)
+        {
+            var previous = new Dictionary<string, object>(this.env);
+
+            this.env = arguments;
+            var result = Evaluate(exp);
+            this.env = previous;
+
+            return result;
         }
 
         public object VisitLetDeclerationStatment(Statement.LetDecleration stmt)
@@ -77,7 +116,7 @@ namespace IronCaml
                 value = Evaluate(stmt.Expression);
             }
 
-            _locals[stmt.Name.Lexeme] = value;
+            env[stmt.Name.Lexeme] = value;
 
             if (Interactive)
             {
@@ -94,7 +133,7 @@ namespace IronCaml
 
         public object VisitVariableExpr(Expression.Variable expr)
         {
-            return _locals[expr.Name.Lexeme];
+            return env[expr.Name.Lexeme];
         }
 
         private object Evaluate(Expression expr)

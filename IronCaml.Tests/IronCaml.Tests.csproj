@@ -35,6 +35,9 @@
     <None Update="ExpressionExamples\binary.ml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="ExpressionExamples\call.ml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ExpressionExamples\function.ml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

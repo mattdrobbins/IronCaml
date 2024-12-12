@@ -13,6 +13,11 @@ namespace IronCaml
             throw new NotImplementedException();
         }
 
+        public string VisitCallExpression(Expression.Call expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitLiteralExpr(Expression.Literal expr)
         {
             throw new NotImplementedException();
