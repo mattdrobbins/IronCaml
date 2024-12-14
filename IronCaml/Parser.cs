@@ -11,7 +11,6 @@ namespace IronCaml
     {
         private class ParseException : Exception
         {
-
         }
 
         private List<Token> _tokens;

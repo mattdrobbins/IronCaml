@@ -9,6 +9,8 @@ namespace IronCaml
 {
     public abstract record Expression
     {
+        public abstract Type ResultType();
+
         public interface Visitor<R>
         {
             R VisitLiteralExpr(Literal expr);
@@ -45,6 +47,11 @@ namespace IronCaml
             }
 
             public override int GetHashCode() => HashCode.Combine(Callee, Arguments);
+
+            public override Type ResultType()
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public record Variable : Expression
@@ -63,7 +70,10 @@ namespace IronCaml
                 return visitor.VisitVariableExpr(this);
             }
 
-            public readonly Token name;
+            public override Type ResultType()
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public record Literal : Expression
@@ -81,6 +91,8 @@ namespace IronCaml
             {
                 return visitor.VisitLiteralExpr(this);
             }
+
+            public override Type ResultType() => _value.GetType();
         }
 
         public record Binary : Expression
@@ -103,6 +115,11 @@ namespace IronCaml
             public override R Accept<R>(Visitor<R> visitor)
             {
                 return visitor.VisitBinaryExpression(this);
+            }
+
+            public override Type ResultType()
+            {
+                throw new NotImplementedException();
             }
         }
 
