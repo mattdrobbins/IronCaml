@@ -73,20 +73,66 @@ namespace IronCaml.Tests
             var result = parser.Parse();
             var creator = new LinqExpressionCreator();
             var dlr = creator.Convert(result);
-            var r = dlr.Result;
+            var r = dlr.Result as LambdaExpression;
+            var func = (Func<long, long, long>)r.Compile();
+            
+            var x = func(3, 5);
 
-            LinqExpressions.ParameterExpression x2 = LinqExpression.Parameter(typeof(long), "x");
-            LinqExpressions.ParameterExpression y2 = LinqExpression.Parameter(typeof(long), "y");
-            var addExpression = LinqExpression.Add(x2, y2);
-            var lambdaExpression = LinqExpression.Lambda<Func<long, long, long>>(addExpression, x2, y2);
-            var resultx = lambdaExpression.Compile()(3, 5);
+            Assert.Equal(x, 8);
+        }
 
-            if (r is Expression<Func<long,long,long>> s)
+        [Fact]
+        public void MicrosoftSampleFunctionTest()
+        {
+            /*
+             * Func<int, int> factorialFunc = (n) =>
             {
-                var x = s.Compile()(3,5);
-            }
+                var res = 1;
+                while (n > 1)
+                {
+                    res = res * n;
+                    n--;
+                }
+                return res;
+            };
+             */
 
-            Assert.Equal(expected, result);
+            var nArgument = LinqExpression.Parameter(typeof(int), "n");
+            var result = LinqExpression.Variable(typeof(int), "result");
+
+            // Creating a label that represents the return value
+            LabelTarget label = LinqExpression.Label(typeof(int));
+
+            var initializeResult = LinqExpression.Assign(result, LinqExpression.Constant(1));
+
+            // This is the inner block that performs the multiplication,
+            // and decrements the value of 'n'
+            var block = LinqExpression.Block(
+                LinqExpression.Assign(result,
+                    LinqExpression.Multiply(result, nArgument)),
+                LinqExpression.PostDecrementAssign(nArgument)
+            );
+
+            // Creating a method body.
+            BlockExpression body = LinqExpression.Block(
+                new[] { result },
+                initializeResult,
+                LinqExpression.Loop(
+                    LinqExpression.IfThenElse(
+                        LinqExpression.GreaterThan(nArgument, LinqExpression.Constant(1)),
+                        block,
+                        LinqExpression.Break(label, result)
+                    ),
+                    label
+                )
+            );
+
+            var factorial = LinqExpression.Lambda(body, nArgument);
+
+            // Compile and run an expression tree.
+            var func = (Func<int, int>)factorial.Compile();
+
+            Console.WriteLine(func(5));
         }
 
         [Fact]

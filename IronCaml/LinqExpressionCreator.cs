@@ -4,22 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using LinqExpressions = System.Linq.Expressions;
-using LinqExpression = System.Linq.Expressions.Expression;
-
 namespace IronCaml
 {
     public class LinqExpressionCreator : Expression.Visitor<LinqExpression>, Statement.Visitor<LinqExpression>
     {
-        public System.Linq.Expressions.Expression ConvertToLinqExpression(Expression expression)
+        private Dictionary<string, LinqExpressions.ParameterExpression> _params = new Dictionary<string, LinqExpressions.ParameterExpression>();
+
+        public LinqExpression ConvertToLinqExpression(Expression expression)
         {
             return expression.Accept(this);
         }
 
-        public System.Linq.Expressions.BlockExpression Convert(List<Statement> statements)
+        public LinqExpressions.BlockExpression Convert(List<Statement> statements)
         {
             var expressions = statements.Select(statement => statement.Accept(this));
-            return System.Linq.Expressions.Expression.Block(expressions);
+            return LinqExpression.Block(expressions);
         }
 
         public LinqExpression VisitBinaryExpression(Expression.Binary expr)
@@ -48,6 +47,11 @@ namespace IronCaml
 
         public LinqExpression VisitVariableExpr(Expression.Variable expr)
         {
+            if (_params.ContainsKey(expr.Name.Lexeme))
+            {
+                return _params[expr.Name.Lexeme];
+            }
+
             return LinqExpression.Variable(typeof(long), expr.Name.Lexeme);
         }
 
@@ -55,7 +59,7 @@ namespace IronCaml
         {
             var expressions = new List<LinqExpression>();
             var expression = stmt.Expression.Accept(this);
-            LinqExpressions.ParameterExpression param = LinqExpression.Variable(expression.Type, stmt.Name.Lexeme);
+            LinqExpressions.ParameterExpression param = LinqExpression.Parameter(expression.Type, stmt.Name.Lexeme);
 
             return LinqExpression.Block(new LinqExpressions.ParameterExpression[] { param },
                 LinqExpression.Assign(param, expression));              
@@ -66,11 +70,19 @@ namespace IronCaml
             var parameters = new List<LinqExpressions.ParameterExpression>() { };
             foreach (var a in stmt.Params)
             {
-                parameters.Add(LinqExpression.Parameter(typeof(long), a.Lexeme));
+                var param = LinqExpression.Parameter(typeof(long), a.Lexeme);
+                parameters.Add(param);
+                _params[a.Lexeme] = param;
             }
 
             var parray = parameters.ToArray();
             var body = stmt.Body.Accept(this);
+
+            foreach (var a in stmt.Params)
+            {
+                _params.Remove(a.Lexeme);
+            }
+
             return LinqExpression.Lambda(body, parray);
         }
 
