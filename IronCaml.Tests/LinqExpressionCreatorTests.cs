@@ -75,7 +75,7 @@ namespace IronCaml.Tests
             var dlr = creator.Convert(result);
             var r = dlr.Result as LambdaExpression;
             var func = (Func<long, long, long>)r.Compile();
-            
+            var a = r.Compile();
             var x = func(3, 5);
 
             Assert.Equal(x, 8);
@@ -128,10 +128,16 @@ namespace IronCaml.Tests
             );
 
             var factorial = LinqExpression.Lambda(body, nArgument);
+            var variable = LinqExpression.Invoke(factorial, LinqExpression.Constant(10));
+            var variableResult = LinqExpression.Lambda(variable).Compile().DynamicInvoke();
 
             // Compile and run an expression tree.
             var func = (Func<int, int>)factorial.Compile();
 
+            var block2 = LinqExpression.Block([variable]);
+            var c = LinqExpression.Constant(block2);
+            var cal = c.Value;
+            var s = block2.Result;
             Console.WriteLine(func(5));
         }
 

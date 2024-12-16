@@ -25,7 +25,7 @@ namespace IronCaml
         {            
             var left = ConvertToLinqExpression(expr.Left);
             var right = ConvertToLinqExpression(expr.Right);
-
+            
             switch (expr.Operator.Type)
             {
                 case TokenType.PLUS:
