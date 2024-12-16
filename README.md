@@ -1,5 +1,7 @@
 # IronCaml
-IronPython is an open-source implementation of the OCaml programming language written for .NET
+IronCaml is an open-source implementation of the OCaml programming language written for .NET.
+
+IronCaml is written on top of the Dynamic Language Runtime
 
 Here is an example how to call OCaml code from a C# program.
 
