@@ -41,6 +41,9 @@
     <None Update="ExpressionExamples\function.ml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="ExpressionExamples\functionSingleArgument.ml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="ExpressionExamples\singleexpression.ml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

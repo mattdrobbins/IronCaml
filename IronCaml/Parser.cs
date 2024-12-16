@@ -151,7 +151,7 @@ namespace IronCaml
 
         private ParseException Error(Token token, String message)
         {
-            Program.Error(token, message);
+            IronCaml.Error(token, message);
             return new ParseException();
         }
 

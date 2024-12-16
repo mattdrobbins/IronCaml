@@ -94,7 +94,45 @@ namespace IronCaml.Tests
 
             var parser = new Parser(tokens);
             var result = parser.Parse();
-            
+
+            Assert.Equal(expected, result);
+
+        }
+
+        [Fact]
+        public void FunctionSingleArgument()
+        {
+            var tokens = new List<Token>
+            {
+                new Token(TokenType.LET, "let", null, 1),
+                new Token(TokenType.IDENTIFIER, "double", null, 1),
+                new Token(TokenType.IDENTIFIER, "x", null, 1),
+                new Token(TokenType.EQUAL, "=", null, 1),
+                new Token(TokenType.IDENTIFIER, "x", null, 1),
+                new Token(TokenType.PLUS, "+", null, 1),
+                new Token(TokenType.IDENTIFIER, "x", null, 1),
+                new Token(TokenType.EOF, "", null, 1),
+            };
+
+            var expectedParams = new List<Token>
+            {
+                new Token(TokenType.IDENTIFIER, "x", null, 1),
+            };
+
+            var expected = new List<Statement>
+            {
+                new Statement.Function(
+                    new Token(TokenType.IDENTIFIER, "double", null, 1),
+                    expectedParams, new Expression.Binary(
+                        new Expression.Variable(new Token(TokenType.IDENTIFIER, "x", null, 1)),
+                        new Token(TokenType.PLUS, "+", null, 1),
+                        new Expression.Variable(new Token(TokenType.IDENTIFIER, "x", null, 1))
+                    ))
+            };
+
+            var parser = new Parser(tokens);
+            var result = parser.Parse();
+
             Assert.Equal(expected, result);
         }
 

@@ -1,15 +1,30 @@
-﻿using static System.Net.Mime.MediaTypeNames;
+﻿using System.Data.SqlTypes;
+using System.Linq.Expressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace IronCaml
 {
-    public class Program
+    public class IronCaml
     {
         static bool _hadError = false;
         static bool _hadRuntimeError = false;
 
-        static void Main(string[] args)
+        public static T Execute<T>(string ocamlCode) where T : System.Delegate
         {
-            
+            var scanner = new Scanner(ocamlCode);
+            var tokens = scanner.ScanTokens();
+
+            Parser parser = new Parser(tokens);
+            List<Statement> stmts = parser.Parse();
+
+            var creator = new LinqExpressionCreator();
+            var linqExpression = creator.Convert(stmts);
+            var result = (linqExpression.Result as LambdaExpression);
+            return (T)(result.Compile());
+        }
+
+        static void Main(string[] args)
+        {            
             RunPrompt();
         }
 

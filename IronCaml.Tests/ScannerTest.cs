@@ -59,6 +59,28 @@ namespace IronCaml.Tests
         }
 
         [Fact]
+        public void FunctionSingleArgument()
+        {
+            var expected = new List<Token>
+            {
+                new Token(TokenType.LET, "let", null, 1),
+                new Token(TokenType.IDENTIFIER, "double", null, 1),
+                new Token(TokenType.IDENTIFIER, "x", null, 1),
+                new Token(TokenType.EQUAL, "=", null, 1),
+                new Token(TokenType.IDENTIFIER, "x", null, 1),
+                new Token(TokenType.PLUS, "+", null, 1),
+                new Token(TokenType.IDENTIFIER, "x", null, 1),
+                new Token(TokenType.EOF, "", null, 1),
+            };
+
+            var text = File.ReadAllText("ExpressionExamples/functionSingleArgument.ml");
+            var scanner = new Scanner(text);
+            var tokens = scanner.ScanTokens();
+
+            Assert.Equal(expected, tokens);
+        }
+
+        [Fact]
         public void SingleExpression()
         {
             var expected = new List<Token>

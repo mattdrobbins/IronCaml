@@ -29,7 +29,7 @@ namespace IronCaml
 
             catch (RuntimeException e)
             {
-                Program.RuntimeError(e);
+                IronCaml.RuntimeError(e);
             }
         }
 

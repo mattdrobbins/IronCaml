@@ -72,6 +72,7 @@ namespace IronCaml.Tests
             var parser = new Parser(tokens);
             var result = parser.Parse();
             var creator = new LinqExpressionCreator();
+            
             var dlr = creator.Convert(result);
             var r = dlr.Result as LambdaExpression;
             var func = (Func<long, long, long>)r.Compile();

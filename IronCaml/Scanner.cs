@@ -71,7 +71,7 @@ namespace IronCaml
                     }
                     else
                     {
-                        Program.Error(_line, "Unexpected Charactor");
+                        IronCaml.Error(_line, "Unexpected Charactor");
                     }
                     break;
             }
@@ -155,7 +155,7 @@ namespace IronCaml
 
             if (Peek() != '\'')
             {
-                Program.Error(_line, "Unterminated Char");
+                IronCaml.Error(_line, "Unterminated Char");
                 return;
             }
 
@@ -173,7 +173,7 @@ namespace IronCaml
             }
             if (IsAtEnd())
             {
-                Program.Error(_line, "Unterminated String");
+                IronCaml.Error(_line, "Unterminated String");
                 return;
             }
 
