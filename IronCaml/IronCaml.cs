@@ -1,5 +1,6 @@
 ﻿using System.Data.SqlTypes;
 using System.Linq.Expressions;
+using static IronCaml.Statement;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace IronCaml
@@ -9,13 +10,25 @@ namespace IronCaml
         static bool _hadError = false;
         static bool _hadRuntimeError = false;
 
-        public static T Execute<T>(string ocamlCode) where T : System.Delegate
+        public static T Execute<T>(string ocamlCode, bool printAst = false) where T : System.Delegate
         {
             var scanner = new Scanner(ocamlCode);
             var tokens = scanner.ScanTokens();
 
             Parser parser = new Parser(tokens);
             List<Statement> stmts = parser.Parse();
+
+            if (printAst)
+            {
+                var astPrinter = new AstPrinter();
+                foreach (var s in stmts)
+                {
+                    if (s is Function f)
+                    {
+                        Console.WriteLine(astPrinter.Print(f.Body));
+                    }
+                }
+            }
 
             var creator = new LinqExpressionCreator();
             var linqExpression = creator.Convert(stmts);
@@ -48,7 +61,7 @@ namespace IronCaml
 
                 //Run(line, interperater);
 
-                var result = Execute<Delegate>(line);
+                var result = Execute<Delegate>(line, true);
 
                 try
                 {

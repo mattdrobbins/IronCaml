@@ -13,6 +13,11 @@ namespace IronCaml
         MULTIPLY,
         SUBTRACT,
 
+        // BOOL
+        BOOL_AND,
+        BOOL_OR,
+        BOOL_NOT,
+
         // LITERALS
         IDENTIFIER,
         INTEGER,
@@ -28,5 +33,8 @@ namespace IronCaml
         FUNCTION,
         FUN,
         TYPE,
+        MODINT,
+        LEFT_PAREN,
+        RIGHT_PAREN,
     }
 }

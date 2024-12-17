@@ -17,9 +17,13 @@ namespace IronCaml
 
             R VisitBinaryExpression(Binary expr);
 
+            R VisitUnaryExpression(Unary expr);
+
             R VisitVariableExpr(Variable expr);
 
             R VisitCallExpression(Call expr);
+
+            R VisitGroupingExpression(Grouping expr);
         }
 
         public record Call : Expression
@@ -47,6 +51,53 @@ namespace IronCaml
             }
 
             public override int GetHashCode() => HashCode.Combine(Callee, Arguments);
+
+            public override Type ResultType()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public record Unary : Expression
+        {
+            private readonly Token _operator;
+            private readonly Expression _right;
+
+            public Expression Right => _right;
+            public Token Operator => _operator;
+
+            public Unary(Token _operator, Expression right)
+            {
+                this._operator = _operator;
+                _right = right;
+            }
+
+            public override R Accept<R>(Visitor<R> visitor)
+            {
+                return visitor.VisitUnaryExpression(this);
+            }
+
+            public override Type ResultType()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public record Grouping : Expression
+        {
+            private readonly Expression _expression;
+
+            public Expression Expression => _expression;
+   
+            public Grouping(Expression expression)
+            {
+                _expression = expression;
+            }
+
+            public override R Accept<R>(Visitor<R> visitor)
+            {
+                return visitor.VisitGroupingExpression(this);
+            }
 
             public override Type ResultType()
             {

@@ -8,24 +8,39 @@ namespace IronCaml
 {
     public class AstPrinter : Expression.Visitor<string>
     {
+        public string Print(Expression expression)
+        {
+            return expression.Accept(this);
+        }
+
+        public string VisitGroupingExpression(Expression.Grouping expr)
+        {
+            return Parenthesise("group", expr.Expression);
+        }
+
         public string VisitBinaryExpression(Expression.Binary expr)
         {
-            throw new NotImplementedException();
+            return Parenthesise(expr.Operator.Lexeme, expr.Left, expr.Right);
         }
 
         public string VisitCallExpression(Expression.Call expr)
         {
-            throw new NotImplementedException();
+            return Parenthesise($"call {(expr.Callee as Expression.Variable).Name.Lexeme} ", expr.Arguments.ToArray());
         }
 
         public string VisitLiteralExpr(Expression.Literal expr)
         {
-            throw new NotImplementedException();
+            return " " + expr.Value.ToString();
         }
 
         public string VisitVariableExpr(Expression.Variable expr)
         {
-            throw new NotImplementedException();
+            return " " + expr.Name.Lexeme;
+        }
+
+        public string VisitUnaryExpression(Expression.Unary expr)
+        {
+            return Parenthesise(expr.Operator.Lexeme, expr.Right);
         }
 
         private string Parenthesise(string name, params Expression[] exprs)

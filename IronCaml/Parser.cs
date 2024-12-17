@@ -73,12 +73,73 @@ namespace IronCaml
 
         private Expression Expression()
         {
-            var expression = Call();
+            return Or();
+        }
 
-            if (Match(TokenType.PLUS, TokenType.SUBTRACT, TokenType.MULTIPLY))
+        private Expression Or()
+        {
+            Expression expr = And();
+
+            while (Match(TokenType.BOOL_OR))
+            {
+                var _operator = Previous();
+                var right = Equality();
+                expr = new Expression.Binary(expr, _operator, right);
+            }
+
+            return expr;
+        }
+
+        private Expression And()
+        {
+            var expr = Equality();
+
+            while (Match(TokenType.BOOL_AND))
+            {
+                var _operator = Previous();
+                var right = Equality();
+                expr = new Expression.Binary(expr, _operator, right);
+            }
+
+            return expr;
+        }
+
+        private Expression Equality()
+        {
+            Expression expr = Term();
+
+            while (Match(TokenType.EQUAL))
             {
                 Token _operator = Previous();
-                var right = Primary();
+                Expression right = Term();
+                expr = new Expression.Binary(expr, _operator, right);
+            }
+
+            return expr;
+        }
+
+        private Expression Term()
+        {
+            var expr = Mod();
+
+            while (Match(TokenType.MULTIPLY, TokenType.SUBTRACT, TokenType.PLUS))
+            {
+                Token _operator = Previous();
+                Expression right = Mod();
+                expr = new Expression.Binary(expr, _operator, right);
+            }
+
+            return expr;
+        }
+
+        private Expression Mod()
+        {
+            var expression = Call();
+
+            if (Match(TokenType.MODINT))
+            {
+                Token _operator = Previous();
+                var right = Call();
                 expression = new Expression.Binary(expression, _operator, right);
             }
 
@@ -87,7 +148,7 @@ namespace IronCaml
 
         private Expression Call()
         {
-            var expression = Primary();
+            var expression = Unary();
 
             var didMatch = false;
             var arguments = new List<Expression>();
@@ -95,7 +156,7 @@ namespace IronCaml
             while (Check(TokenType.IDENTIFIER) || Check(TokenType.INTEGER) || Check(TokenType.STRING))
             {
                 didMatch = true;
-                arguments.Add(Primary());
+                arguments.Add(Unary());
             }
 
             if (didMatch)
@@ -104,6 +165,18 @@ namespace IronCaml
             }
 
             return expression;
+        }
+
+        private Expression Unary()
+        {
+            if (Match(TokenType.BOOL_NOT))
+            {
+                var _operator = Previous();
+                var right = Primary();
+                return new Expression.Unary(_operator, right);
+            }
+
+            return Primary();
         }
 
         private Expression Primary()
@@ -120,6 +193,13 @@ namespace IronCaml
             if (Match(TokenType.IDENTIFIER))
             {
                 return new Expression.Variable(Previous());
+            }
+
+            if (Match(TokenType.LEFT_PAREN))
+            {
+                var exp = Expression();
+                Consume(TokenType.RIGHT_PAREN, "Expect ')' after expression");
+                return new Expression.Grouping(exp);
             }
 
             throw Error(Peek(), "Expect expression.");

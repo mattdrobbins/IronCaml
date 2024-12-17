@@ -18,7 +18,10 @@ namespace IronCaml
         private Dictionary<string, TokenType> _keywords = new Dictionary<string, TokenType>
         {
             { "let", TokenType.LET },
-            { "in", TokenType.IN }
+            { "in", TokenType.IN },
+            { "mod", TokenType.MODINT },
+            { "not", TokenType.BOOL_NOT },
+            { "or", TokenType.BOOL_OR }
         };
 
         public Scanner(string source)
@@ -44,6 +47,20 @@ namespace IronCaml
             var c = Advance();
             switch (c)
             {
+                case '(':
+                    AddToken(TokenType.LEFT_PAREN); 
+                    break;
+                case ')':
+                    AddToken(TokenType.RIGHT_PAREN); 
+                    break;
+                case '&':
+                    Match('&');
+                    AddToken(TokenType.BOOL_AND);
+                    break;
+                case '|':
+                    Match('|');
+                    AddToken(TokenType.BOOL_OR);
+                    break;
                 case '=':
                     AddToken(TokenType.EQUAL);
                     break;

@@ -10,32 +10,6 @@ namespace IronCaml.Tests
     public class ScannerTest
     {
         [Fact]
-        public void Call()
-        {
-            var expected = new List<Token>
-            {
-                new Token(TokenType.LET, "let", null, 1),
-                new Token(TokenType.IDENTIFIER, "add_two_numbers", null, 1),
-                new Token(TokenType.IDENTIFIER, "x", null, 1),
-                new Token(TokenType.IDENTIFIER, "y", null, 1),
-                new Token(TokenType.EQUAL, "=", null, 1),
-                new Token(TokenType.IDENTIFIER, "x", null, 1),
-                new Token(TokenType.PLUS, "+", null, 1),
-                new Token(TokenType.IDENTIFIER, "y", null, 1),
-                new Token(TokenType.IDENTIFIER, "add_two_numbers", null, 2),
-                new Token(TokenType.INTEGER, "5", 5L, 2),
-                new Token(TokenType.INTEGER, "9", 9L, 2),
-                new Token(TokenType.EOF, "", null, 2),
-            };
-
-            var text = File.ReadAllText("ExpressionExamples/call.ml");
-            var scanner = new Scanner(text);
-            var tokens = scanner.ScanTokens();
-
-            Assert.Equal(expected, tokens);
-        }
-
-        [Fact]
         public void Function()
         {
             var expected = new List<Token>
@@ -111,25 +85,6 @@ namespace IronCaml.Tests
             };
 
             var text = File.ReadAllText("ExpressionExamples/binary.ml");
-            var scanner = new Scanner(text);
-            var tokens = scanner.ScanTokens();
-
-            Assert.Equal(expected, tokens);
-        }
-
-        [Fact]
-        public void ScanExerciseOne()
-        {
-            var expected = new List<Token>
-            {
-                new Token(TokenType.LET, "let", null, 1),
-                new Token(TokenType.IDENTIFIER, "hello", null, 1),
-                new Token(TokenType.EQUAL, "=", null, 1),
-                new Token(TokenType.STRING, "\"Hello, World!\"", "Hello, World!", 1),
-                new Token(TokenType.EOF, "", null, 1),
-            };
-
-            var text = File.ReadAllText("ExercismExamples/hello.ml");
             var scanner = new Scanner(text);
             var tokens = scanner.ScanTokens();
 

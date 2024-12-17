@@ -126,6 +126,11 @@ namespace IronCaml
             return value;
         }
 
+        public object VisitGroupingExpression(Expression.Grouping expr)
+        {
+            return Evaluate(expr.Expression);
+        }
+
         public object VisitLiteralExpr(Expression.Literal expr)
         {
             return expr.Value;
@@ -144,6 +149,11 @@ namespace IronCaml
         private object Execute(Statement stmt)
         {
             return stmt.Accept(this);
+        }
+
+        public object VisitUnaryExpression(Expression.Unary expr)
+        {
+            throw new NotImplementedException();
         }
     }
 }

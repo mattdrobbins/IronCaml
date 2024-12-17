@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -29,7 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ExercismExamples\hello.ml">
+    <None Update="ExercismExamples\hello_world.ml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ExercismExamples\leap.ml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ExpressionExamples\binary.ml">
@@ -47,6 +50,10 @@
     <None Update="ExpressionExamples\singleexpression.ml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ExercismExamples\" />
   </ItemGroup>
 
 </Project>

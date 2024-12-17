@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@ namespace IronCaml
     public class LinqExpressionCreator : Expression.Visitor<LinqExpression>, Statement.Visitor<LinqExpression>
     {
         private Dictionary<string, LinqExpressions.ParameterExpression> _params = new Dictionary<string, LinqExpressions.ParameterExpression>();
-
+        private Dictionary<string, LambdaExpression> _functions = new Dictionary<string, LambdaExpression>();
         public LinqExpression ConvertToLinqExpression(Expression expression)
         {
             return expression.Accept(this);
@@ -17,7 +18,7 @@ namespace IronCaml
 
         public LinqExpressions.BlockExpression Convert(List<Statement> statements)
         {
-            var expressions = statements.Select(statement => statement.Accept(this));
+            var expressions = statements.Select(statement => statement.Accept(this));            
             return LinqExpression.Block(expressions);
         }
 
@@ -34,6 +35,28 @@ namespace IronCaml
                     return LinqExpression.Multiply(left, right);
                 case TokenType.SUBTRACT:
                     return LinqExpression.Subtract(left, right);
+                case TokenType.MODINT:
+                    return LinqExpression.Modulo(left, right);                  
+                case TokenType.EQUAL:
+                    return LinqExpression.Equal(left, right);
+                case TokenType.BOOL_AND:
+                    return LinqExpression.And(left, right);
+                case TokenType.BOOL_OR:
+                    return LinqExpression.Or(left, right);
+            }
+
+            return null;
+        }
+
+
+        public LinqExpression VisitUnaryExpression(Expression.Unary expr)
+        {
+            var right = ConvertToLinqExpression(expr.Right);
+
+            switch (expr.Operator.Type)
+            {
+                case TokenType.BOOL_NOT:
+                    return LinqExpression.Not(right);
             }
 
             return null;
@@ -41,7 +64,8 @@ namespace IronCaml
 
         public LinqExpression VisitCallExpression(Expression.Call expr)
         {
-            throw new NotImplementedException();
+            return LinqExpression.Invoke(_functions[(expr.Callee as Expression.Variable).Name.Lexeme], 
+                expr.Arguments.Select(s => s.Accept(this)));
         }
 
         public LinqExpression VisitLiteralExpr(Expression.Literal expr)
@@ -87,7 +111,14 @@ namespace IronCaml
                 _params.Remove(a.Lexeme);
             }
 
-            return LinqExpression.Lambda(body, parray);
+            var function = LinqExpression.Lambda(body, parray);
+            _functions[stmt.Name.Lexeme] = function;
+            return function;             
+        }
+
+        public LinqExpression VisitGroupingExpression(Expression.Grouping expr)
+        {
+            return expr.Expression.Accept(this);
         }
 
         public LinqExpression VisitExpressionStatement(Statement.ExpressionStatement stmt)
