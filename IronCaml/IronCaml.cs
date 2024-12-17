@@ -19,8 +19,12 @@ namespace IronCaml
 
             var creator = new LinqExpressionCreator();
             var linqExpression = creator.Convert(stmts);
-            var result = (linqExpression.Result as LambdaExpression);
-            return (T)(result.Compile());
+            if (linqExpression.Result is LambdaExpression le)
+            {
+                return (T)(le.Compile());
+            }
+
+            return (T)(LinqExpression.Lambda(linqExpression).Compile());
         }
 
         static void Main(string[] args)
@@ -32,6 +36,7 @@ namespace IronCaml
         {
             var interperater = new Interperater(true);
 
+            Console.WriteLine("OCaml running on .NET");
             while (true)
             {
                 Console.Write("> ");
@@ -41,7 +46,20 @@ namespace IronCaml
                     break;
                 }
 
-                Run(line, interperater);
+                //Run(line, interperater);
+
+                var result = Execute<Delegate>(line);
+
+                try
+                {
+                    Console.WriteLine(result.DynamicInvoke());
+
+                }
+                catch (Exception)
+                {
+
+                    Console.WriteLine(result);
+                }
             }
         }
 

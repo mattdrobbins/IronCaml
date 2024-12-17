@@ -75,7 +75,7 @@ namespace IronCaml
         {
             var expression = Call();
 
-            if (Match(TokenType.PLUS))
+            if (Match(TokenType.PLUS, TokenType.SUBTRACT, TokenType.MULTIPLY))
             {
                 Token _operator = Previous();
                 var right = Primary();

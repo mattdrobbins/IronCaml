@@ -25,12 +25,16 @@ namespace IronCaml
         {            
             var left = ConvertToLinqExpression(expr.Left);
             var right = ConvertToLinqExpression(expr.Right);
-            
+
             switch (expr.Operator.Type)
             {
                 case TokenType.PLUS:
                     return LinqExpression.Add(left, right);
-                }
+                case TokenType.MULTIPLY:
+                    return LinqExpression.Multiply(left, right);
+                case TokenType.SUBTRACT:
+                    return LinqExpression.Subtract(left, right);
+            }
 
             return null;
         }

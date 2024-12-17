@@ -50,6 +50,12 @@ namespace IronCaml
                 case '+':
                     AddToken(TokenType.PLUS);
                     break;
+                case '*':
+                    AddToken(TokenType.MULTIPLY);
+                    break;
+                case '-':
+                    AddToken(TokenType.SUBTRACT);
+                    break;
                 case '\n':
                     _line++;
                     break;

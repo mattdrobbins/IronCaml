@@ -10,6 +10,8 @@ namespace IronCaml
     {     
         // SINGLE CHAR TOKENS
         PLUS,
+        MULTIPLY,
+        SUBTRACT,
 
         // LITERALS
         IDENTIFIER,
