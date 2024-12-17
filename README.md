@@ -17,10 +17,10 @@ let leap_year y = divisible_by_four y && (not (divisible_by_hundred y) || divisi
 ```
 
 ```cs
-  var code = File.ReadAllText("leap.ml");
-  var isLeapYear = IronCaml.Execute<Func<long, bool>>(code);
-  // false
-  isLeapYear(1800);
-  // true
-  isLeapYear(1996);
+var code = File.ReadAllText("leap.ml");
+var isLeapYear = IronCaml.Execute<Func<long, bool>>(code);
+// false
+isLeapYear(1800);
+// true
+isLeapYear(1996);
 ```
