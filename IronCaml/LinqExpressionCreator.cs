@@ -11,15 +11,22 @@ namespace IronCaml
     {
         private Dictionary<string, LinqExpressions.ParameterExpression> _params = new Dictionary<string, LinqExpressions.ParameterExpression>();
         private Dictionary<string, LambdaExpression> _functions = new Dictionary<string, LambdaExpression>();
+        private Dictionary<string, ParameterExpression> _variables = new Dictionary<string, ParameterExpression>();
+
         public LinqExpression ConvertToLinqExpression(Expression expression)
         {
             return expression.Accept(this);
         }
 
-        public LinqExpressions.BlockExpression Convert(List<Statement> statements)
+        public void SetVariable(string name, LinqExpressions.ParameterExpression value)
         {
+            _variables[name] = value;
+        }
+
+        public LinqExpressions.BlockExpression Convert(List<Statement> statements)
+        {            
             var expressions = statements.Select(statement => statement.Accept(this));            
-            return LinqExpression.Block(expressions);
+            return LinqExpression.Block(_variables.Values, expressions);
         }
 
         public LinqExpression VisitBinaryExpression(Expression.Binary expr)
@@ -80,17 +87,16 @@ namespace IronCaml
                 return _params[expr.Name.Lexeme];
             }
 
-            return LinqExpression.Variable(typeof(long), expr.Name.Lexeme);
+            return _variables[expr.Name.Lexeme];
         }
 
         public LinqExpression VisitLetDeclerationStatment(Statement.LetDecleration stmt)
         {
             var expressions = new List<LinqExpression>();
             var expression = stmt.Expression.Accept(this);
-            LinqExpressions.ParameterExpression param = LinqExpression.Parameter(expression.Type, stmt.Name.Lexeme);
+            var param = _variables[stmt.Name.Lexeme];
 
-            return LinqExpression.Block(new LinqExpressions.ParameterExpression[] { param },
-                LinqExpression.Assign(param, expression));              
+            return LinqExpression.Assign(param, expression);              
         }
 
         public LinqExpression VisitFunctionStatement(Statement.Function stmt)

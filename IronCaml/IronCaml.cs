@@ -31,7 +31,11 @@ namespace IronCaml
             }
 
             var creator = new LinqExpressionCreator();
+            var resolver = new VariableResolver(creator);
+            resolver.Resolve(stmts);
+
             var linqExpression = creator.Convert(stmts);
+
             if (linqExpression.Result is LambdaExpression le)
             {
                 return (T)(le.Compile());

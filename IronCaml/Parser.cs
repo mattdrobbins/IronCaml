@@ -53,12 +53,16 @@ namespace IronCaml
             }
 
             Consume(TokenType.EQUAL, "Expect equals after let");
-
+            
             expression = Expression();
 
             if (arguments.Any())
             {
                 return new Statement.Function(name, arguments, expression);
+            }
+
+            if (Match(TokenType.IN))
+            {
             }
 
             return new Statement.LetDecleration(name, expression);

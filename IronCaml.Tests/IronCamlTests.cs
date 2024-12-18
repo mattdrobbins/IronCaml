@@ -16,5 +16,13 @@ namespace IronCaml.Tests
             var result = addTwoNumbers(5, 15);
             Assert.Equal(result, 20);
         }
+
+        [Fact]
+        public void TwoLets()
+        {
+            var addTwoNumbers = IronCaml.Execute<Func<long>>("let x = 3 let y = 7");
+            var result = addTwoNumbers();
+            Assert.Equal(result, 7);
+        }
     }
 }

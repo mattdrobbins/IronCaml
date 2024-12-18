@@ -30,6 +30,8 @@ namespace IronCaml.Tests
             var result = parser.Parse();
 
             var creator = new LinqExpressionCreator();
+            var resolver = new VariableResolver(creator);
+            resolver.Resolve(result);
             var dlr = creator.Convert(result);           
             var x = LinqExpression.Lambda<Func<long>>(dlr).Compile();
             var r = x();

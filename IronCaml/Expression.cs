@@ -170,7 +170,18 @@ namespace IronCaml
 
             public override Type ResultType()
             {
-                throw new NotImplementedException();
+                switch (_operator.Type)
+                {
+                    case TokenType.PLUS:
+                    case TokenType.MULTIPLY:
+                    case TokenType.SUBTRACT:
+                        return typeof(long);
+                    case TokenType.BOOL_NOT: 
+                    case TokenType.BOOL_OR:
+                        return typeof(bool);
+                    default:
+                        return typeof(long);
+                }
             }
         }
 
