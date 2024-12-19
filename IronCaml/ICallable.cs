@@ -8,7 +8,6 @@ namespace IronCaml
 {
     public interface ICallable
     {
-        object Call(Interperater interperater, List<object> args);
         int Arity();
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static IronCaml.Expression;
 
 namespace IronCaml
 {
@@ -24,6 +25,104 @@ namespace IronCaml
             R VisitCallExpression(Call expr);
 
             R VisitGroupingExpression(Grouping expr);
+
+            R VisitLetExpression(LetExpression expr);
+
+            R VisitAssignmentExpression(Assignment expr);
+
+            R VisitFunctionExpression(Function expr);
+
+
+        }
+
+        public record Assignment : Expression
+        {
+            private readonly Token _name;
+            private readonly Expression _initialiser;
+
+            public Token Name => _name;
+            public Expression Initialiser => _initialiser;
+
+            public Assignment(Token name, Expression initialiser)
+            {
+                _name = name;
+                _initialiser = initialiser;
+            }
+
+            public override R Accept<R>(Visitor<R> visitor)
+            {
+                return visitor.VisitAssignmentExpression(this);
+            }
+
+            public override Type ResultType()
+            {
+                return Initialiser.ResultType();
+            }
+        }
+
+        public record Function : Expression
+        {
+            private readonly Token _name;
+            private readonly Expression _body;
+            private readonly List<Token> _params;
+
+            public Token Name => _name;
+            public Expression Body => _body;
+
+            public List<Token> Params => _params;
+
+            public Function(Token name, Expression body, List<Token> _params)
+            {
+                _name = name;
+                _body = body;
+                this._params = _params;
+            }
+
+            public override R Accept<R>(Visitor<R> visitor)
+            {
+                return visitor.VisitFunctionExpression(this);
+            }
+
+            public override Type ResultType()
+            {
+                return Body.ResultType();
+            }
+
+            public virtual bool Equals(Function? obj)
+            {
+                return obj.Name == obj.Name && obj.Body == Body && Params.SequenceEqual(obj.Params);
+            }
+
+            public override int GetHashCode() => HashCode.Combine(Name, Body, Params);
+        }
+
+        public record LetExpression : Expression
+        {
+            private readonly Token _name;
+            private readonly Expression _initialiser;
+            private readonly Expression _body;
+
+            public Token Name => _name;
+            public Expression Initialiser => _initialiser;  
+            public Expression Body => _body;
+
+
+            public LetExpression(Token name, Expression initialiser, Expression Body)
+            {
+                _name = name;
+                _initialiser = initialiser;
+                _body = Body;
+            }
+
+            public override R Accept<R>(Visitor<R> visitor)
+            {
+                return visitor.VisitLetExpression(this);
+            }
+
+            public override Type ResultType()
+            {
+                return Body.ResultType();
+            }
         }
 
         public record Call : Expression

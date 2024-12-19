@@ -32,13 +32,13 @@ namespace IronCaml.Tests
 
             var expected = new List<Statement>
             {
-                new Statement.Function(
+                new Statement.Function(new Expression.Function(
                     new Token(TokenType.IDENTIFIER, "add_two_numbers", null, 1),
-                    expectedParams, new Expression.Binary(
+                    new Expression.Binary(
                         new Expression.Variable(new Token(TokenType.IDENTIFIER, "x", null, 1)),
                         new Token(TokenType.PLUS, "+", null, 1),
                         new Expression.Variable(new Token(TokenType.IDENTIFIER, "y", null, 1))
-                    ))
+                    ), expectedParams))
             };
 
             var parser = new Parser(tokens);
@@ -70,17 +70,22 @@ namespace IronCaml.Tests
 
             var expected = new List<Statement>
             {
-                new Statement.Function(
+                new Statement.Function(new Expression.Function(
                     new Token(TokenType.IDENTIFIER, "double", null, 1),
-                    expectedParams, new Expression.Binary(
+                    new Expression.Binary(
                         new Expression.Variable(new Token(TokenType.IDENTIFIER, "x", null, 1)),
                         new Token(TokenType.PLUS, "+", null, 1),
                         new Expression.Variable(new Token(TokenType.IDENTIFIER, "x", null, 1))
-                    ))
-            };
+                    ),
+                    expectedParams))
+            };           
 
             var parser = new Parser(tokens);
             var result = parser.Parse();
+
+            var resultExpression = (result[0] as Statement.Function).Func;
+            var expectedExpression = (expected[0] as Statement.Function).Func;
+
 
             Assert.Equal(expected, result);
         }

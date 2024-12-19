@@ -23,19 +23,13 @@ namespace IronCaml
 
         public record Function : Statement
         {
-            private readonly Token _name;
-            private readonly List<Token> _params;
-            private readonly Expression _body;
+            private readonly Expression.Function _function;
 
-            public Token Name => _name;
-            public Expression Body => _body;
-            public List<Token> Params => new List<Token>(_params);
+            public Expression.Function Func => _function;
 
-            public Function(Token name, List<Token> _params, Expression body)
+            public Function(Expression.Function function)
             {
-                _name = name;
-                this._params = _params;
-                _body = body;
+                _function = function;
             }
 
             public override T Accept<T>(Visitor<T> visitor)
@@ -45,10 +39,10 @@ namespace IronCaml
 
             public virtual bool Equals(Function? obj)
             {
-                return Name == obj.Name && Body == obj.Body && Params.SequenceEqual(obj.Params);
+                return (Func == obj.Func);
             }
 
-            public override int GetHashCode() => HashCode.Combine(Body, Name, Params);
+            public override int GetHashCode() => HashCode.Combine(Func);
         }
 
         public record ExpressionStatement : Statement

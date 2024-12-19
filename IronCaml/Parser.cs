@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static IronCaml.Statement;
 
 namespace IronCaml
@@ -34,49 +35,56 @@ namespace IronCaml
 
         private Statement Decleration()
         {
-            if (Match(TokenType.LET)) return Let();
-            return ExpressionStatement();
+            return Statement();
         }
 
-        private Statement Let()
+        private Statement Statement()
         {
-            Token name = Consume(TokenType.IDENTIFIER, "Expect identifier");
+            Expression expression = Expression();
 
-            Expression expression = null;
-
-            var arguments = new List<Token>();
-
-            while(Match(TokenType.IDENTIFIER))
+            if (expression is Expression.Function f)
             {
-                var argument = Previous();
-                arguments.Add(argument);
+                return new Statement.Function(f);
+            }
+            else if (expression is Expression.Assignment a)
+            {
+                return new Statement.LetDecleration(a.Name, a.Initialiser);
             }
 
-            Consume(TokenType.EQUAL, "Expect equals after let");
-            
-            expression = Expression();
-
-            if (arguments.Any())
-            {
-                return new Statement.Function(name, arguments, expression);
-            }
-
-            if (Match(TokenType.IN))
-            {
-            }
-
-            return new Statement.LetDecleration(name, expression);
-        }
-
-
-        private Statement ExpressionStatement()
-        {
-            var value = Expression();
-            return new ExpressionStatement(value);
+            return new Statement.ExpressionStatement(expression);
         }
 
         private Expression Expression()
         {
+            if (Match(TokenType.LET))
+            {
+                var identifiers = new List<Token>();
+
+                while (Match(TokenType.IDENTIFIER))
+                {
+                    identifiers.Add(Previous());
+                }
+
+                Consume(TokenType.EQUAL, "Expect equals after let");
+
+                var initialiser = Expression();
+
+                if (Match(TokenType.IN))
+                {
+                    Expression expression = Expression();
+                    return new Expression.LetExpression(identifiers[0], initialiser, expression);
+                }
+                else if (identifiers.Count == 1)
+                {
+                    return new Expression.Assignment(identifiers[0], initialiser);
+                }
+                else
+                {
+                    return new Expression.Function(identifiers[0], initialiser, identifiers.Slice(1, identifiers.Count - 1));
+                }
+
+            }
+
             return Or();
         }
 

@@ -25,7 +25,7 @@ namespace IronCaml
                 {
                     if (s is Function f)
                     {
-                        Console.WriteLine(astPrinter.Print(f.Body));
+                        Console.WriteLine(astPrinter.Print(f.Func.Body));
                     }
                 }
             }
@@ -51,7 +51,7 @@ namespace IronCaml
 
         private static void RunPrompt()
         {
-            var interperater = new Interperater(true);
+            //var interperater = new Interperater(true);
 
             Console.WriteLine("OCaml running on .NET");
             while (true)
@@ -80,7 +80,7 @@ namespace IronCaml
             }
         }
 
-        private static void Run(string line, Interperater interperater)
+        private static void Run(string line)
         {
             var scanner = new Scanner(line);
             var tokens = scanner.ScanTokens();
@@ -88,7 +88,7 @@ namespace IronCaml
             Parser parser = new Parser(tokens);
             List<Statement> stmts = parser.Parse();
 
-            interperater.Interperate(stmts);
+            //interperater.Interperate(stmts);
         }
 
         public static void RuntimeError(RuntimeException runtimeException)

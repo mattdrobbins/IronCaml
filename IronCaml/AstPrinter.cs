@@ -57,5 +57,20 @@ namespace IronCaml
 
             return builder.ToString();
         }
+
+        public string VisitLetExpression(Expression.LetExpression expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VisitAssignmentExpression(Expression.Assignment expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VisitFunctionExpression(Expression.Function expr)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

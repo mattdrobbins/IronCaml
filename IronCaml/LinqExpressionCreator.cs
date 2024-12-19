@@ -24,13 +24,13 @@ namespace IronCaml
         }
 
         public LinqExpressions.BlockExpression Convert(List<Statement> statements)
-        {            
-            var expressions = statements.Select(statement => statement.Accept(this));            
+        {
+            var expressions = statements.Select(statement => statement.Accept(this));
             return LinqExpression.Block(_variables.Values, expressions);
         }
 
         public LinqExpression VisitBinaryExpression(Expression.Binary expr)
-        {            
+        {
             var left = ConvertToLinqExpression(expr.Left);
             var right = ConvertToLinqExpression(expr.Right);
 
@@ -43,7 +43,7 @@ namespace IronCaml
                 case TokenType.SUBTRACT:
                     return LinqExpression.Subtract(left, right);
                 case TokenType.MODINT:
-                    return LinqExpression.Modulo(left, right);                  
+                    return LinqExpression.Modulo(left, right);
                 case TokenType.EQUAL:
                     return LinqExpression.Equal(left, right);
                 case TokenType.BOOL_AND:
@@ -71,7 +71,7 @@ namespace IronCaml
 
         public LinqExpression VisitCallExpression(Expression.Call expr)
         {
-            return LinqExpression.Invoke(_functions[(expr.Callee as Expression.Variable).Name.Lexeme], 
+            return LinqExpression.Invoke(_functions[(expr.Callee as Expression.Variable).Name.Lexeme],
                 expr.Arguments.Select(s => s.Accept(this)));
         }
 
@@ -96,30 +96,19 @@ namespace IronCaml
             var expression = stmt.Expression.Accept(this);
             var param = _variables[stmt.Name.Lexeme];
 
-            return LinqExpression.Assign(param, expression);              
+            return LinqExpression.Assign(param, expression);
+        }
+
+        public LinqExpression VisitLetExpression(Expression.LetExpression expr)
+        {
+            var parameter = LinqExpression.Variable(expr.ResultType(), expr.Name.Lexeme);
+            return LinqExpression.Block([parameter], [LinqExpression.Assign(parameter, expr.Initialiser.Accept(this)),
+                expr.Body.Accept(this)]);
         }
 
         public LinqExpression VisitFunctionStatement(Statement.Function stmt)
         {
-            var parameters = new List<LinqExpressions.ParameterExpression>() { };
-            foreach (var a in stmt.Params)
-            {
-                var param = LinqExpression.Parameter(typeof(long), a.Lexeme);
-                parameters.Add(param);
-                _params[a.Lexeme] = param;
-            }
-
-            var parray = parameters.ToArray();
-            var body = stmt.Body.Accept(this);
-
-            foreach (var a in stmt.Params)
-            {
-                _params.Remove(a.Lexeme);
-            }
-
-            var function = LinqExpression.Lambda(body, parray);
-            _functions[stmt.Name.Lexeme] = function;
-            return function;             
+            return stmt.Func.Accept(this);
         }
 
         public LinqExpression VisitGroupingExpression(Expression.Grouping expr)
@@ -129,7 +118,35 @@ namespace IronCaml
 
         public LinqExpression VisitExpressionStatement(Statement.ExpressionStatement stmt)
         {
-            return  stmt.Expression.Accept(this);
+            return stmt.Expression.Accept(this);
+        }
+
+        public LinqExpression VisitAssignmentExpression(Expression.Assignment expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public LinqExpression VisitFunctionExpression(Expression.Function expr)
+        {
+            var parameters = new List<LinqExpressions.ParameterExpression>() { };
+            foreach (var a in expr.Params)
+            {
+                var param = LinqExpression.Parameter(typeof(long), a.Lexeme);
+                parameters.Add(param);
+                _params[a.Lexeme] = param;
+            }
+
+            var parray = parameters.ToArray();
+            var body = expr.Body.Accept(this);
+
+            foreach (var a in expr.Params)
+            {
+                _params.Remove(a.Lexeme);
+            }
+
+            var function = LinqExpression.Lambda(body, parray);
+            _functions[expr.Name.Lexeme] = function;
+            return function;
         }
     }
 }
