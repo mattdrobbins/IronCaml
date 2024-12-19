@@ -54,24 +54,34 @@ namespace IronCaml
             Console.WriteLine("OCaml running on .NET");
             while (true)
             {
+                Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Write("> ");
                 var line = Console.ReadLine();
+
                 if (line == "\u0004")
                 {
                     break;
                 }
 
-                var result = Execute<Delegate>(line, true);
-
                 try
                 {
-                    Console.WriteLine(result.DynamicInvoke());
+                    var result = Execute<Delegate>(line, true);
+                    try
+                    {
+                        Console.WriteLine(result.DynamicInvoke());
+                    }
+                    catch (Exception)
+                    {
+
+                        Console.WriteLine(result);
+                    }
 
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-
-                    Console.WriteLine(result);
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(e.Message);
+                    Console.ForegroundColor = ConsoleColor.Gray;
                 }
             }
         }

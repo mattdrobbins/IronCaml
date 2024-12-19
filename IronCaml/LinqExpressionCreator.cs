@@ -27,6 +27,10 @@ namespace IronCaml
         public LinqExpressions.BlockExpression Convert(List<Statement> statements)
         {
             var expressions = statements.Select(statement => statement.Accept(this));
+            if (!expressions.Any()) 
+            {
+                expressions = [LinqExpression.Empty()];
+            }
             return LinqExpression.Block(_globals.Values, expressions);
         }
 
