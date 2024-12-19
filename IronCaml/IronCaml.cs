@@ -51,8 +51,6 @@ namespace IronCaml
 
         private static void RunPrompt()
         {
-            //var interperater = new Interperater(true);
-
             Console.WriteLine("OCaml running on .NET");
             while (true)
             {
@@ -62,8 +60,6 @@ namespace IronCaml
                 {
                     break;
                 }
-
-                //Run(line, interperater);
 
                 var result = Execute<Delegate>(line, true);
 
@@ -78,17 +74,6 @@ namespace IronCaml
                     Console.WriteLine(result);
                 }
             }
-        }
-
-        private static void Run(string line)
-        {
-            var scanner = new Scanner(line);
-            var tokens = scanner.ScanTokens();
-
-            Parser parser = new Parser(tokens);
-            List<Statement> stmts = parser.Parse();
-
-            //interperater.Interperate(stmts);
         }
 
         public static void RuntimeError(RuntimeException runtimeException)

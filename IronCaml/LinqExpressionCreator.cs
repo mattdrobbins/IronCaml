@@ -11,22 +11,23 @@ namespace IronCaml
     {
         private Dictionary<string, LinqExpressions.ParameterExpression> _params = new Dictionary<string, LinqExpressions.ParameterExpression>();
         private Dictionary<string, LambdaExpression> _functions = new Dictionary<string, LambdaExpression>();
-        private Dictionary<string, ParameterExpression> _variables = new Dictionary<string, ParameterExpression>();
+        private Dictionary<string, ParameterExpression> _globals = new Dictionary<string, ParameterExpression>();
+        private Environment _environment = new Environment();
 
         public LinqExpression ConvertToLinqExpression(Expression expression)
         {
             return expression.Accept(this);
         }
 
-        public void SetVariable(string name, LinqExpressions.ParameterExpression value)
+        public void SetGlobals(string name, LinqExpressions.ParameterExpression value)
         {
-            _variables[name] = value;
+            _globals[name] = value;
         }
 
         public LinqExpressions.BlockExpression Convert(List<Statement> statements)
         {
             var expressions = statements.Select(statement => statement.Accept(this));
-            return LinqExpression.Block(_variables.Values, expressions);
+            return LinqExpression.Block(_globals.Values, expressions);
         }
 
         public LinqExpression VisitBinaryExpression(Expression.Binary expr)
@@ -86,24 +87,33 @@ namespace IronCaml
             {
                 return _params[expr.Name.Lexeme];
             }
+            if (_environment.Get(expr.Name) != null)
+            {
+                return _environment.Get(expr.Name);
+            }
 
-            return _variables[expr.Name.Lexeme];
+            return _globals[expr.Name.Lexeme];
         }
 
         public LinqExpression VisitLetDeclerationStatment(Statement.LetDecleration stmt)
         {
             var expressions = new List<LinqExpression>();
             var expression = stmt.Expression.Accept(this);
-            var param = _variables[stmt.Name.Lexeme];
+            var param = _globals[stmt.Name.Lexeme];
 
             return LinqExpression.Assign(param, expression);
         }
 
         public LinqExpression VisitLetExpression(Expression.LetExpression expr)
         {
-            var parameter = LinqExpression.Variable(expr.ResultType(), expr.Name.Lexeme);
-            return LinqExpression.Block([parameter], [LinqExpression.Assign(parameter, expr.Initialiser.Accept(this)),
+            var previous = _environment;
+            _environment = new Environment(previous);
+            var parameter = LinqExpression.Variable(expr.Initialiser.ResultType(), expr.Name.Lexeme);
+            _environment.Define(expr.Name.Lexeme, parameter);
+            var body =  LinqExpression.Block([parameter], [LinqExpression.Assign(parameter, expr.Initialiser.Accept(this)),
                 expr.Body.Accept(this)]);
+            _environment = previous;
+            return body;
         }
 
         public LinqExpression VisitFunctionStatement(Statement.Function stmt)

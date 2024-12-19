@@ -35,7 +35,7 @@ namespace IronCaml
 
         public object VisitLetDeclerationStatment(Statement.LetDecleration stmt)
         {
-            _creator.SetVariable(stmt.Name.Lexeme, LinqExpression.Variable(stmt.Expression.ResultType(), stmt.Name.Lexeme));
+            _creator.SetGlobals(stmt.Name.Lexeme, LinqExpression.Variable(stmt.Expression.ResultType(), stmt.Name.Lexeme));
             return null;
         }
     }
