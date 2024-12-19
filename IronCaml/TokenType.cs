@@ -12,6 +12,7 @@ namespace IronCaml
         PLUS,
         MULTIPLY,
         SUBTRACT,
+        DIVIDE,
 
         // BOOL
         BOOL_AND,

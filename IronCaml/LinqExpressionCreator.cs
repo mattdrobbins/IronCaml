@@ -41,6 +41,8 @@ namespace IronCaml
                     return LinqExpression.Add(left, right);
                 case TokenType.MULTIPLY:
                     return LinqExpression.Multiply(left, right);
+                case TokenType.DIVIDE:
+                    return LinqExpression.Divide(left, right);
                 case TokenType.SUBTRACT:
                     return LinqExpression.Subtract(left, right);
                 case TokenType.MODINT:

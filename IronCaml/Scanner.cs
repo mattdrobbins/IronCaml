@@ -70,6 +70,9 @@ namespace IronCaml
                 case '*':
                     AddToken(TokenType.MULTIPLY);
                     break;
+                case '/':
+                    AddToken(TokenType.DIVIDE);
+                    break;
                 case '-':
                     AddToken(TokenType.SUBTRACT);
                     break;

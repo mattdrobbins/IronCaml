@@ -134,7 +134,7 @@ namespace IronCaml
         {
             var expr = Mod();
 
-            while (Match(TokenType.MULTIPLY, TokenType.SUBTRACT, TokenType.PLUS))
+            while (Match(TokenType.MULTIPLY, TokenType.SUBTRACT, TokenType.PLUS, TokenType.DIVIDE))
             {
                 Token _operator = Previous();
                 Expression right = Mod();
