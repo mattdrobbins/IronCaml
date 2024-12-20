@@ -65,6 +65,8 @@ namespace IronCaml
             private readonly Token _name;
             private readonly Expression _body;
             private readonly List<Token> _params;
+            
+            public Dictionary<Token, Type> ParamTypes { get; private set; } = new Dictionary<Token, Type>();
 
             public Token Name => _name;
             public Expression Body => _body;

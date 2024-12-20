@@ -147,7 +147,7 @@ namespace IronCaml
             var parameters = new List<LinqExpressions.ParameterExpression>() { };
             foreach (var a in expr.Params)
             {
-                var param = LinqExpression.Parameter(typeof(long), a.Lexeme);
+                var param = LinqExpression.Parameter(expr.ParamTypes[a], a.Lexeme);
                 parameters.Add(param);
                 _params[a.Lexeme] = param;
             }
